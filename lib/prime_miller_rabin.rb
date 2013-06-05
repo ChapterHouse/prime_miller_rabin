@@ -1,3 +1,4 @@
+require 'backports' if RUBY_VERSION < '1.9'
 require 'prime'
 require "prime_miller_rabin/version"
 
