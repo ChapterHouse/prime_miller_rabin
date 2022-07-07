@@ -1,4 +1,4 @@
-# coding: utf-8
+# frozen_string_literal: true
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'prime_miller_rabin/version'
@@ -8,17 +8,27 @@ Gem::Specification.new do |spec|
   spec.version       = Prime::MillerRabin::VERSION
   spec.authors       = ["Frank Hall"]
   spec.email         = ["ChapterHouse.Dune@gmail.com"]
+
   spec.description   = %q{Test primes faster than Ruby's default methods by using the Miller-Rabin method.}
   spec.summary       = %q{Test primes faster than Ruby's default methods by using the Miller-Rabin method.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/ChapterHouse/#{spec.name}"
   spec.license       = "MIT"
+  spec.required_ruby_version = ">= 3.0.0"
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.metadata["homepage_uri"] = spec.homepage
+  spec.metadata["source_code_uri"] = "https://github.com/ChapterHouse/#{spec.name}/tree/v#{spec.version}"
+
+  # Specify which files should be added to the gem when it is released.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  spec.files = Dir.chdir(File.expand_path(__dir__)) do
+    `git ls-files -z`.split("\x0").reject do |f|
+      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
+    end
+  end
+  spec.bindir = "exe"
+  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "backports" # Wish this could be conditional. It is only used for ruby 1.8 for as long as I support it.
-  spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
+  spec.add_development_dependency 'bundler', '~> 2.3'
+  spec.add_development_dependency 'rake', '~> 13'
 end

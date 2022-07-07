@@ -1,57 +1,15 @@
-require 'backports' if RUBY_VERSION < '1.9'
 require 'prime'
 require "prime_miller_rabin/version"
 
 class Prime::MillerRabin < Prime::PseudoPrimeGenerator
 
   def self.speed_intercept
-    if RUBY_VERSION >= "2.0"
-      Prime.send(:prepend, Prime::MillerRabin::PrimeIntercept)
-    else
-      Prime.class_eval <<-INTERCEPT_EVAL, __FILE__, __LINE__ + 1
-        def prime_with_intercept?(value, *args)
-          args.first.instance_of?(Prime::MillerRabin) ? args.first.prime?(value) : prime_without_intercept?(value, *args)
-        end
-
-        alias_method "prime_without_intercept?", "prime?"
-        alias_method "prime?", "prime_with_intercept?"
-      INTERCEPT_EVAL
-    end
+    Prime.send(:prepend, Prime::MillerRabin::PrimeIntercept)
   end
 
   def self.make_default
-    if RUBY_VERSION >= "2.0"
-      Prime.send(:prepend, Prime::MillerRabin::Default::Prime, Prime::MillerRabin::PrimeIntercept)
-      Integer.send(:prepend, Prime::MillerRabin::Default::Integer)
-    else
-      Prime.class_eval <<-PRIME_DEFAULT_EVAL, __FILE__, __LINE__ + 1
-        # Change the default generator used to be MillerRabin
-        def prime_with_mr_default?(value, generator = ::Prime::MillerRabin.new)
-          generator.instance_of?(Prime::MillerRabin) ? generator.prime?(value) : prime_without_mr_default?(value, generator)
-        end
-
-        def prime_division_with_mr_default?(value, generator = ::Prime::MillerRabin.new)
-          prime_division_without_mr_default?(value, generator)
-        end
-
-        alias_method "prime_without_mr_default?", "prime?"
-        alias_method "prime?", "prime_with_mr_default?"
-
-        alias_method "prime_division_without_mr_default?", "prime_division"
-        alias_method "prime_division", "prime_division_with_mr_default?"
-      PRIME_DEFAULT_EVAL
-
-      Integer.class_eval <<-INTEGER_DEFAULT_EVAL, __FILE__, __LINE__ + 1
-
-        def prime_division_with_mr_default(generator = ::Prime::MillerRabin.new)
-          prime_division_without_mr_default(generator)
-        end
-
-        alias_method "prime_division_with_mr_default?", "prime_division"
-        alias_method "prime_division", "prime_division_with_mr_default?"
-      INTEGER_DEFAULT_EVAL
-
-    end
+    Prime.send(:prepend, Prime::MillerRabin::Default::Prime, Prime::MillerRabin::PrimeIntercept)
+    Integer.send(:prepend, Prime::MillerRabin::Default::Integer)
   end
 
   def succ()
